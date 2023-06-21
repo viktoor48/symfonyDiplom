@@ -3,3 +3,13 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+upload_doctors:
+    path: '/upload'
+    controller: 'App\Controller\ApiController::upload'
+    methods: [POST]
+
+upload_time_slots:
+    path: '/upload-time-slots'
+    controller: 'App\Controller\ApiController::uploadTimeSlots'
+    methods: [ POST ]
