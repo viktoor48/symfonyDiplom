@@ -149,6 +149,7 @@ class ApiController extends AbstractController
     public function uploadTimeSlots(Request $request, EntityManagerInterface $entityManager): Response
     {
         $jsonData = json_decode($request->getContent(), true);
+        $createdTimeSlots = [];
 
         // Create new time slots from JSON data
         foreach ($jsonData['timeSlots'] as $slotData) {
@@ -162,10 +163,20 @@ class ApiController extends AbstractController
             $clinic = $entityManager->getRepository(Clinic::class)->find($slotData['clinic_id']);
             $timeSlot->setClinic($clinic);
             $entityManager->persist($timeSlot);
+
+            $createdTimeSlots[] = [
+                'id' => $timeSlot->getId(),
+                'start' => $timeSlot->getStart()->format('Y-m-d H:i:s'),
+                'time_end' => $timeSlot->getTimeEnd()->format('Y-m-d H:i:s'),
+                'date' => $timeSlot->getDate()->format('Y-m-d'),
+                'booked' => $timeSlot->isBooked(),
+                'doctor_id' => $timeSlot->getDoctor()->getId(),
+                'clinic_id' => $timeSlot->getClinic()->getId(),
+            ];
         }
         $entityManager->flush();
 
-        // Return a success response
-        return new Response('Time slots created successfully', Response::HTTP_CREATED);
+        // Return a success response with created time slots data
+        return new JsonResponse(['time_slots' => $createdTimeSlots], Response::HTTP_CREATED);
     }
 }
